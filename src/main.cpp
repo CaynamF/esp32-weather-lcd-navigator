@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
 #include <LiquidCrystal_I2C.h>
 #include "secrets.h"
 
@@ -16,6 +17,7 @@ void garantirWiFiConectado();
 void seguranca();
 void preparacaoHttp();
 void consultarAPI();
+void LocalizacaoCondicaoGeral();
 
 void setup()
 {
@@ -159,4 +161,57 @@ void consultarAPI()
     Serial.print(http.errorToString(httpCode));
   }
   http.end();
+}
+
+void LocalizacaoCondicaoGeral()
+{
+  JsonDocument doc;
+
+  DeserializationError erro = deserializeJson(doc, resposta);
+
+  if (!erro)
+  {
+    lcd.clear();
+    String cidade = "";
+    String estado = "";
+    String horario = "";
+    String clima = "";
+
+    if (doc["location"]["name"].is<JsonVariant>())
+    {
+      cidade = doc["location"]["name"].as<String>();
+    }
+    if (doc["location"]["region"].is<JsonVariant>())
+    {
+      estado = doc["location"]["region"].as<String>();
+    }
+    if (doc["location"]["localtime"].is<JsonVariant>())
+    {
+      horario = doc["location"]["localtime"].as<String>();
+      horario = horario.substring(11);
+    }
+    if (doc["current"]["condition"]["text"].is<JsonVariant>())
+    {
+      clima = doc["current"]["condition"]["text"].as<String>();
+    }
+
+    lcd.setCursor(0, 0);
+    lcd.print(cidade);
+
+    lcd.setCursor(0, 1);
+    lcd.print(estado);
+
+    lcd.setCursor(0, 2);
+    lcd.print(horario);
+
+    lcd.setCursor(0, 3);
+    lcd.print(clima);
+  }
+  else
+  {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Erro no JSON");
+  }
+  doc.clear();
 }
