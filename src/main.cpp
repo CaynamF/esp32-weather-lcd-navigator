@@ -18,6 +18,7 @@ void seguranca();
 void preparacaoHttp();
 void consultarAPI();
 void LocalizacaoCondicaoGeral();
+void TemperaturaUmidade();
 
 void setup()
 {
@@ -211,6 +212,58 @@ void LocalizacaoCondicaoGeral()
   {
     lcd.clear();
     lcd.setCursor(0, 0);
+    lcd.print("Erro no JSON");
+  }
+  doc.clear();
+}
+
+void TemperaturaUmidade()
+{
+  JsonDocument doc;
+
+  DeserializationError erro = deserializeJson(doc, resposta);
+
+  if (!erro)
+  {
+    lcd.clear();
+    float temperaturaAtual;
+    float sensacaoTermica;
+    int umidade;
+    int nebulosidade;
+
+    if (doc["current"]["temp_c"].is<JsonVariant>())
+    {
+      temperaturaAtual = doc["current"]["temp_c"];
+    }
+    if (doc["current"]["feelslike_c"].is<JsonVariant>())
+    {
+      sensacaoTermica = doc["current"]["feelslike_c"];
+    }
+    if (doc["current"]["humidity"].is<JsonVariant>())
+    {
+      umidade = doc["current"]["humidity"];
+    }
+    if (doc["current"]["cloud"].is<JsonVariant>())
+    {
+      nebulosidade = doc["current"]["cloud"];
+    }
+
+    lcd.setCursor(0, 0);
+    lcd.printf("Temp: %.1fC", temperaturaAtual);
+
+    lcd.setCursor(0, 1);
+    lcd.printf("Sens: %.1fC", sensacaoTermica);
+
+    lcd.setCursor(0, 2);
+    lcd.printf("Umidade: %.1d%%", umidade);
+
+    lcd.setCursor(0, 3);
+    lcd.printf("Nuvens: %.1d%%", nebulosidade);
+  }
+  else
+  {
+    lcd.clear();
+    lcd.setCursor(0, 1);
     lcd.print("Erro no JSON");
   }
   doc.clear();
