@@ -70,3 +70,29 @@ void conectarWiFi()
     lcd.print("====================");
   }
 }
+
+void garantirWiFiConectado()
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print("====================");
+    lcd.setCursor(0, 1);
+    lcd.println("WiFi desconectado.");
+    lcd.setCursor(0, 2);
+    lcd.print("Tentando reconectar...");
+    lcd.setCursor(0, 3);
+    lcd.print("====================");
+    conectarWiFi();
+  }
+
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print("============================");
+    lcd.setCursor(0, 1);
+    lcd.print("Não foi possivel reconectar.");
+    lcd.setCursor(0, 3);
+    lcd.print("============================");
+  }
+}
