@@ -24,12 +24,16 @@ void TemperaturaUmidade();
 void direcaoVentos();
 void VentosOutrosDados();
 void botao();
+void resetarTela();
 
 const char pinBotao = 0;
 static int contagem = 1;
 
 unsigned long tempoAnterior = 0;
 const long intervalo = 60000;
+
+unsigned long tempoAnteriorEspera = 0;
+const long espera = 5000;
 
 void setup()
 {
@@ -54,6 +58,8 @@ void loop()
 
   botao();
   atualizarDadosAPI();
+
+  resetarTela();
 
   switch (contagem)
   {
@@ -81,9 +87,23 @@ void botao()
     {
       contagem = 1;
     }
+    tempoAnteriorEspera = millis();
     lcd.clear();
   }
   estadoAnteriorBotao = estadoAtualBotao;
+}
+
+void resetarTela()
+{
+  unsigned long tempoResetar = millis();
+  if (contagem > 1)
+  {
+    if (tempoResetar - tempoAnteriorEspera >= espera)
+    {
+      contagem = 1;
+      lcd.clear();
+    }
+  }
 }
 
 void conectarWiFi()
@@ -412,7 +432,6 @@ void VentosOutrosDados()
   {
     lcd.clear();
     float velocidadeVento;
-    String direcaoVento = "";
     int pressao;
     float indiceUV;
 
