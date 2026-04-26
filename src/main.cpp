@@ -9,10 +9,13 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 WiFiClientSecure client;
 HTTPClient http;
+String resposta;
 
 void conectarWiFi();
 void garantirWiFiConectado();
 void seguranca();
+void preparacaoHttp();
+void consultarAPI();
 
 void setup()
 {
@@ -131,3 +134,29 @@ void preparacaoHttp()
   consultarAPI();
 }
 
+void consultarAPI()
+{
+  int httpCode = http.GET();
+
+  if (httpCode > 0)
+  {
+    Serial.print("Código HTTP: ");
+    Serial.println(httpCode);
+
+    if (httpCode == HTTP_CODE_OK)
+    {
+      resposta = http.getString();
+    }
+    else
+    {
+      Serial.print("A API respondeu, mas com codigo de erro: ");
+      Serial.print(httpCode);
+    }
+  }
+  else
+  {
+    Serial.print("Erro de requisição HTTP: ");
+    Serial.print(http.errorToString(httpCode));
+  }
+  http.end();
+}
