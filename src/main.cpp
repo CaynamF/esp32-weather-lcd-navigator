@@ -1,8 +1,16 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <LiquidCrystal_I2C.h>
+#include "secrets.h"
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+WiFiClientSecure client;
+
+void conectarWiFi();
+void garantirWiFiConectado();
+void seguranca();
 
 void setup()
 {
@@ -96,3 +104,9 @@ void garantirWiFiConectado()
     lcd.print("============================");
   }
 }
+
+void seguranca()
+{
+  client.setInsecure();
+}
+
