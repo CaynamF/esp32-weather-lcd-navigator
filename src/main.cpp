@@ -1,12 +1,14 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <HTTPClient.h>
 #include <LiquidCrystal_I2C.h>
 #include "secrets.h"
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 WiFiClientSecure client;
+HTTPClient http;
 
 void conectarWiFi();
 void garantirWiFiConectado();
@@ -108,5 +110,24 @@ void garantirWiFiConectado()
 void seguranca()
 {
   client.setInsecure();
+}
+
+void preparacaoHttp()
+{
+  if (!http.begin(client, URL_API))
+  {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("===================="); // 20 caracteres exatos
+    lcd.setCursor(0, 1);
+    lcd.print("Erro: Conexao HTTP");
+    lcd.setCursor(0, 2);
+    lcd.print("Verifique a URL");
+    lcd.setCursor(0, 3);
+    lcd.print("====================");
+    return;
+  }
+  http.setTimeout(10000);
+  consultarAPI();
 }
 
