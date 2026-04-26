@@ -1,11 +1,72 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup()
 {
-
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
 }
 
 void loop()
 {
+
+}
+
+void conectarWiFi()
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("==================");
+  lcd.setCursor(0, 1);
+  lcd.print("Conectando WiFi...");
+  lcd.setCursor(0, 2);
+  lcd.print("==================");
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_SENHA);
+
+  int tentativas = 0;
+  const int maxTentativas = 30;
   
+  while (WiFi.status() != WL_CONNECTED && tentativas < maxTentativas)
+  {
+    delay(500);
+    lcd.setCursor(tentativas % 20, 1);
+    lcd.print(".");
+    tentativas++;
+  }
+
+  lcd.clear();
+
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    Serial.println("WiFi Conectado");
+    Serial.print("IP: ");
+    Serial.print(WiFi.localIP());
+
+    lcd.setCursor(0, 0);
+    lcd.println("================");
+    lcd.setCursor(0, 1);
+    lcd.print("WiFi: Conectado!");
+    lcd.setCursor(0, 2);
+    lcd.print(WiFi.localIP().toString());
+    lcd.setCursor(0, 3);
+    lcd.println("================");
+  }
+  else
+  {
+    Serial.println("Falha na conexao");
+    lcd.setCursor(0, 0);
+    lcd.print("====================");
+    lcd.setCursor(0, 1);
+    lcd.print("Erro no WiFi!");
+    lcd.setCursor(0, 2);
+    lcd.print("Verefique rede/senha");
+    lcd.setCursor(0, 3);
+    lcd.print("====================");
+  }
 }
