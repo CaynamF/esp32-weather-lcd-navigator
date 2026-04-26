@@ -18,6 +18,7 @@ void garantirWiFiConectado();
 void seguranca();
 void preparacaoHttp();
 void consultarAPI();
+void atualizarDadosAPI();
 void LocalizacaoCondicaoGeral();
 void TemperaturaUmidade();
 void direcaoVentos();
@@ -27,13 +28,24 @@ void botao();
 const char pinBotao = 0;
 static int contagem = 1;
 
+unsigned long tempoAnterior = 0;
+const long intervalo = 60000;
+
 void setup()
 {
+  Serial.begin(9600);
   pinMode(0, INPUT_PULLUP);
 
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
+
+  conectarWiFi();
+  seguranca();
+  preparacaoHttp();
+  consultarAPI();
+
+  lcd.clear();
 }
 
 void loop()
@@ -41,6 +53,7 @@ void loop()
   garantirWiFiConectado();
 
   botao();
+  atualizarDadosAPI();
 
   switch (contagem)
   {
@@ -203,6 +216,17 @@ void consultarAPI()
     Serial.print(http.errorToString(httpCode));
   }
   http.end();
+}
+
+void atualizarDadosAPI()
+{
+  unsigned long tempoAtual = millis();
+
+  if (tempoAtual - tempoAnterior >= intervalo)
+  {
+    tempoAnterior = tempoAtual;
+    consultarAPI();
+  }  
 }
 
 void LocalizacaoCondicaoGeral()
