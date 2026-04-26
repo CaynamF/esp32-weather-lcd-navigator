@@ -22,9 +22,15 @@ void LocalizacaoCondicaoGeral();
 void TemperaturaUmidade();
 void direcaoVentos();
 void VentosOutrosDados();
+void botao();
+
+const char pinBotao = 0;
+static int contagem = 1;
 
 void setup()
 {
+  pinMode(0, INPUT_PULLUP);
+
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
@@ -32,7 +38,39 @@ void setup()
 
 void loop()
 {
+  garantirWiFiConectado();
 
+  botao();
+
+  switch (contagem)
+  {
+  case 1:
+    LocalizacaoCondicaoGeral();
+    break;
+  case 2:
+    TemperaturaUmidade();
+    break;
+  case 3:
+    VentosOutrosDados();
+    break;
+  }
+}
+
+void botao()
+{
+  static bool estadoAnteriorBotao = 1;
+  bool estadoAtualBotao = digitalRead(pinBotao);
+
+  if (!estadoAtualBotao && estadoAnteriorBotao)
+  {
+    contagem++;
+    if (contagem > 3)
+    {
+      contagem = 1;
+    }
+    lcd.clear();
+  }
+  estadoAnteriorBotao = estadoAtualBotao;
 }
 
 void conectarWiFi()
