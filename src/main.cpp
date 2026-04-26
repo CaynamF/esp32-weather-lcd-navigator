@@ -11,6 +11,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 WiFiClientSecure client;
 HTTPClient http;
 String resposta;
+String direcaoVento = "";
 
 void conectarWiFi();
 void garantirWiFiConectado();
@@ -19,6 +20,8 @@ void preparacaoHttp();
 void consultarAPI();
 void LocalizacaoCondicaoGeral();
 void TemperaturaUmidade();
+void direcaoVentos();
+void VentosOutrosDados();
 
 void setup()
 {
@@ -259,6 +262,128 @@ void TemperaturaUmidade()
 
     lcd.setCursor(0, 3);
     lcd.printf("Nuvens: %.1d%%", nebulosidade);
+  }
+  else
+  {
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("Erro no JSON");
+  }
+  doc.clear();
+}
+
+void direcaoVentos()
+{
+  if (direcaoVento == "N")
+    {
+      direcaoVento = "Norte ";
+    }
+    else if (direcaoVento == "E")
+    {
+      direcaoVento = "Leste";
+    }
+    else if (direcaoVento == "S")
+    {
+      direcaoVento = "Sul";
+    }
+    else if (direcaoVento == "W")
+    {
+      direcaoVento = "Oeste";
+    }
+    else if (direcaoVento == "NE")
+    {
+      direcaoVento = "Nordeste";
+    }
+    else if (direcaoVento == "SE")
+    {
+      direcaoVento = "Sudeste";
+    }
+    else if (direcaoVento == "SO")
+    {
+      direcaoVento = "Sudoeste";
+    }
+    else if (direcaoVento == "NO")
+    {
+      direcaoVento = "Noroeste";
+    }
+    else if (direcaoVento == "NNE")
+    {
+      direcaoVento = "Nor-nordeste";
+    }
+    else if (direcaoVento == "NNO")
+    {
+      direcaoVento = "Nor-noroeste";
+    }
+    else if (direcaoVento == "ENE")
+    {
+      direcaoVento = "Les-nordeste";
+    }
+    else if (direcaoVento == "ESE")
+    {
+      direcaoVento = "Les-sudeste";
+    }
+    else if (direcaoVento == "SSE")
+    {
+      direcaoVento = "Sul-sudeste";
+    }
+    else if (direcaoVento == "SSO")
+    {
+      direcaoVento = "Sul-sudoeste";
+    }
+    else if (direcaoVento == "OSO")
+    {
+      direcaoVento = "Oes-sudoeste";
+    }
+    else
+    {
+      direcaoVento = "Oes-noroeste";
+    }
+}
+
+void VentosOutrosDados()
+{
+  JsonDocument doc;
+
+  DeserializationError erro = deserializeJson(doc, resposta);
+
+  if (!erro)
+  {
+    lcd.clear();
+    float velocidadeVento;
+    String direcaoVento = "";
+    int pressao;
+    float indiceUV;
+
+    if (doc["current"]["wind_kph"].is<JsonVariant>())
+    {
+      velocidadeVento = doc["current"]["wind_kph"];
+    }
+    if (doc["current"]["wind_dir"].is<String>())
+    {
+      direcaoVento = doc["current"]["wind_dir"].as<String>();
+    }
+    if (doc["current"]["pressure_mb"].is<JsonVariant>())
+    {
+      pressao = doc["current"]["pressure_mb"];
+    }
+    if (doc["current"]["uv"].is<JsonVariant>())
+    {
+      indiceUV = doc["current"]["uv"];
+    }
+
+    direcaoVentos();
+    
+    lcd.setCursor(0, 0);
+    lcd.printf("Vento: %.1fkm/h", velocidadeVento);
+
+    lcd.setCursor(0, 1);
+    lcd.printf("Dir: %s", direcaoVento.c_str());
+
+    lcd.setCursor(0, 2);
+    lcd.printf("Pressao: %.1dmb", pressao);
+
+    lcd.setCursor(0, 3);
+    lcd.printf("UV: %.1f", indiceUV);
   }
   else
   {
