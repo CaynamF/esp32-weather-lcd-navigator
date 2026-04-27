@@ -15,15 +15,15 @@ String direcaoVento = "";
 
 void conectarWiFi();
 void garantirWiFiConectado();
-void seguranca();
-void preparacaoHttp();
+void configurarSeguranca();
+void prepararRequisicaoHttp();
 void consultarAPI();
 void atualizarDadosAPI();
-void LocalizacaoCondicaoGeral();
-void TemperaturaUmidade();
-void direcaoVentos();
-void VentosOutrosDados();
-void botao();
+void exibirPaginaLocalizacao();
+void exibirPaginaClima();
+void traduzirDirecaoVento();
+void exibirPaginaVento();
+void verificarBotao();
 void resetarTela();
 
 const char pinBotao = 0;
@@ -45,8 +45,8 @@ void setup()
   lcd.setCursor(0, 0);
 
   conectarWiFi();
-  seguranca();
-  preparacaoHttp();
+  configurarSeguranca();
+  prepararRequisicaoHttp();
   consultarAPI();
 
   lcd.clear();
@@ -56,7 +56,7 @@ void loop()
 {
   garantirWiFiConectado();
 
-  botao();
+  verificarBotao();
   atualizarDadosAPI();
 
   resetarTela();
@@ -64,18 +64,18 @@ void loop()
   switch (contagem)
   {
   case 1:
-    LocalizacaoCondicaoGeral();
+    exibirPaginaLocalizacao();
     break;
   case 2:
-    TemperaturaUmidade();
+    exibirPaginaClima();
     break;
   case 3:
-    VentosOutrosDados();
+    exibirPaginaVento();
     break;
   }
 }
 
-void botao()
+void verificarBotao()
 {
   static bool estadoAnteriorBotao = 1;
   bool estadoAtualBotao = digitalRead(pinBotao);
@@ -187,12 +187,12 @@ void garantirWiFiConectado()
   }
 }
 
-void seguranca()
+void configurarSeguranca()
 {
   client.setInsecure();
 }
 
-void preparacaoHttp()
+void prepararRequisicaoHttp()
 {
   if (!http.begin(client, URL_API))
   {
@@ -249,7 +249,7 @@ void atualizarDadosAPI()
   }  
 }
 
-void LocalizacaoCondicaoGeral()
+void exibirPaginaLocalizacao()
 {
   JsonDocument doc;
 
@@ -257,7 +257,6 @@ void LocalizacaoCondicaoGeral()
 
   if (!erro)
   {
-    lcd.clear();
     String cidade = "";
     String estado = "";
     String horario = "";
@@ -302,7 +301,7 @@ void LocalizacaoCondicaoGeral()
   doc.clear();
 }
 
-void TemperaturaUmidade()
+void exibirPaginaClima()
 {
   JsonDocument doc;
 
@@ -310,7 +309,6 @@ void TemperaturaUmidade()
 
   if (!erro)
   {
-    lcd.clear();
     float temperaturaAtual;
     float sensacaoTermica;
     int umidade;
@@ -354,7 +352,7 @@ void TemperaturaUmidade()
   doc.clear();
 }
 
-void direcaoVentos()
+void traduzirDirecaoVento()
 {
   if (direcaoVento == "N")
     {
@@ -422,7 +420,7 @@ void direcaoVentos()
     }
 }
 
-void VentosOutrosDados()
+void exibirPaginaVento()
 {
   JsonDocument doc;
 
@@ -430,7 +428,6 @@ void VentosOutrosDados()
 
   if (!erro)
   {
-    lcd.clear();
     float velocidadeVento;
     int pressao;
     float indiceUV;
@@ -452,7 +449,7 @@ void VentosOutrosDados()
       indiceUV = doc["current"]["uv"];
     }
 
-    direcaoVentos();
+    traduzirDirecaoVento();
     
     lcd.setCursor(0, 0);
     lcd.printf("Vento: %.1fkm/h", velocidadeVento);
