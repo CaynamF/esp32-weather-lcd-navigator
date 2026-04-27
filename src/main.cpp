@@ -1,3 +1,12 @@
+/*
+ * Autor: Caynam Félix Oliveira
+ * Programa: Estação Meteorológica via API
+ * Descrição: Conecta ao WiFi para buscar dados de clima e 
+ * exibe em 3 telas no LCD, navegáveis por botão.
+ * Data: 27/04/2026
+ * Versão: 2.0
+ */
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
